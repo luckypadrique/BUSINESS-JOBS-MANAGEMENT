@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Business Owner Job Management System - Post and manage job listings, track applicant statuses, and update business profiles.">
+    <title>Business Job Manager - Owner Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <div id="app">
+        <!-- 1. LOGIN PAGE VIEW -->
+        <div id="view-login" class="auth-layout view-section active"></div>
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo-symbol">✦</div>
+                <h1>Business Job Manager</h1>
+                <p>Sign in to manage your company jobs and applicants</p>
+            </div>
+
+            <div id="login-error-container" class="form-error" style="display: none;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span id="login-error-text">Invalid email or password.</span>
+            </div>
+
+            <form id="login-form" novalidate>
+                <div class="form-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" class="input-field" placeholder="" required>
+                    <span class="validation-msg" id="err-login-email">Please enter a valid email address.</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" class="input-field" placeholder="" required>
+                    <span class="validation-msg" id="err-login-password">Password is required.</span>
+                </div>
+
+                <button type="submit" class="btn btn-primary form-submit-btn">
+                    Login
+                </button>
+
+                <button type="button" onclick="showChangePassword()">
+                    Change Password
+                </button>
+
+                <div id="changePasswordBox" style="display: none;">
+                    <h3>Change Password</h3>
+
+                    <input type="password" id="currentPassword" placeholder="Current Password">
+
+                    <input type="password" id="newPassword" placeholder="New Password">
+
+                    <input type="password" id="confirmPassword" placeholder="Confirm New Password">
+
+                    <button type="button" onclick="changePassword()">
+                        Save New Password
+                    </button>
+
+                    <button type="button" onclick="hideChangePassword()">
+                        Cancel
+                    </button>
+
+                    <p id="passwordMessage"></p>
+                </div>
+            </form>
+
+            <div class="login-container">
+
+                <p>
+                    Don't have an account?
+
+                    <button type="button" onclick="showApplicantLogin()">
+                        Create Applicant Account
+                    </button>
+                </p>
+
+                <!-- APPLICANT LOGIN - HIDDEN BY DEFAULT -->
+
+
+                <div id="applicantLoginBox" style="display: none;">
+
+                    <h3>Applicant</h3>
+
+                    <input type="email" id="applicantEmail" placeholder="Email">
+
+                    <input type="password" id="applicantPassword" placeholder="Password">
+
+                    <button type="button" onclick="applicantLogin()">
+                        Login
+                    </button>
+
+                    <button type="button" onclick="hideApplicantLogin()">
+                        Cancel
+                    </button>
+
+                </div>
+
+                <div class="login-divider">or</div>
+
+                <button id="btn-quick-demo" class="btn btn-demo form-submit-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    Quick Demo Login
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. DASHBOARD / LOGGED-IN VIEW CONTAINER -->
+        <div id="dashboard-container" class="dashboard-layout" style="display: none;">
+            <!-- Mobile Backdrop -->
+            <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+            <!-- Sidebar Navigation -->
+            <aside class="sidebar" id="app-sidebar">
+                <div class="sidebar-logo">
+                    <div class="logo-symbol">✦</div>
+                    <span class="logo-text">JobManager</span>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <a class="nav-item active" data-target="dashboard">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="9" rx="1"></rect>
+                            <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+                            <rect x="14" y="12" width="7" height="9" rx="1"></rect>
+                            <rect x="3" y="16" width="7" height="5" rx="1"></rect>
+                        </svg>
+                        Dashboard
+                    </a>
+                    <a class="nav-item" data-target="job-list">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                        </svg>
+                        Job List
+                    </a>
+                    <a class="nav-item" data-target="applicants">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        Applicants
+                    </a>
+                    <a class="nav-item" data-target="profile">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        Business Profile
+                    </a>
+                    <a class="nav-item" data-target="logout" style="margin-top: auto;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        Logout
+                    </a>
+                </nav>
+
+                <div class="sidebar-profile">
+                    <div class="profile-avatar" id="sidebar-avatar-initials">OB</div>
+                    <div class="profile-info">
+                        <span class="profile-name" id="sidebar-profile-name">Owner Name</span>
+                        <span class="profile-role">Business Owner</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Panel -->
+            <main class="main-content">
+                <!-- Top Header -->
+                <header class="top-header">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <button class="menu-toggle" id="btn-sidebar-toggle" aria-label="Toggle Sidebar Menu">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="3" y1="12" x2="21" y2="12"></line>
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <line x1="3" y1="18" x2="21" y2="18"></line>
+                            </svg>
+                        </button>
+                        <div class="header-title">
+                            <h2 id="view-title">Dashboard</h2>
+                        </div>
+                    </div>
+
+                    <div class="header-actions">
+                        <div class="business-header-details">
+                            <span class="header-biz-name" id="header-business-name">Business Name</span>
+                            <span class="header-biz-owner" id="header-owner-name">Owner Name</span>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- View Body Content -->
+                <div class="content-body">
+
+                    <!-- 2A. DASHBOARD VIEW -->
+                    <section id="view-dashboard" class="view-section">
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <div class="metric-icon-box indigo">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                                    </svg>
+                                </div>
+                                <div class="metric-details">
+                                    <span class="metric-label">Total Jobs</span>
+                                    <span class="metric-value" id="metric-total-jobs">0</span>
+                                </div>
+                            </div>
+
+                            <div class="metric-card">
+                                <div class="metric-icon-box green">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 14 14"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="metric-details">
+                                    <span class="metric-label">Active Jobs</span>
+                                    <span class="metric-value" id="metric-active-jobs">0</span>
+                                </div>
+                            </div>
+
+                            <div class="metric-card">
+                                <div class="metric-icon-box rose">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="metric-details">
+                                    <span class="metric-label">Completed Jobs</span>
+                                    <span class="metric-value" id="metric-completed-jobs">0</span>
+                                </div>
+                            </div>
+
+                            <div class="metric-card">
+                                <div class="metric-icon-box amber">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                </div>
+                                <div class="metric-details">
+                                    <span class="metric-label">Total Applicants</span>
+                                    <span class="metric-value" id="metric-total-applicants">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-details-grid">
+                            <!-- Left: Recent Applicants -->
+                            <div class="dashboard-panel">
+                                <div class="panel-header">
+                                    <h3>Recent Applicants</h3>
+                                    <button class="btn btn-secondary btn-outline"
+                                        style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" data-nav="applicants">View
+                                        All</button>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="data-table" id="dashboard-applicants-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Applicant</th>
+                                                <th>Job Position</th>
+                                                <th>Applied On</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="dashboard-applicants-list">
+                                            <!-- Dynamically rendered -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Right: Job Status Graph & Analytics Widget -->
+                            <div class="dashboard-panel">
+                                <div class="panel-header">
+                                    <h3>Job Fill Rate</h3>
+                                </div>
+                                <div class="chart-widget">
+                                    <div class="chart-bar-row">
+                                        <div class="chart-bar-labels">
+                                            <span>Completed / Filled Listings</span>
+                                            <span id="chart-percentage-text">0%</span>
+                                        </div>
+                                        <div class="chart-bar-track">
+                                            <div class="chart-bar-fill" id="chart-percentage-fill"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="chart-metric-breakdown">
+                                        <div class="breakdown-item">
+                                            <span class="breakdown-lbl">Active Recruiting</span>
+                                            <span class="breakdown-val" id="breakdown-active"
+                                                style="color: var(--primary);">0</span>
+                                        </div>
+                                        <div class="breakdown-item">
+                                            <span class="breakdown-lbl">Completed</span>
+                                            <span class="breakdown-val" id="breakdown-completed"
+                                                style="color: var(--success-text);">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 2B. JOB LIST VIEW -->
+                    <section id="view-job-list" class="view-section">
+                        <div class="section-header-actions">
+                            <h3>Available Openings</h3>
+                            <button class="btn btn-primary" id="btn-post-job-trigger">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                Post New Job
+                            </button>
+                        </div>
+
+                        <!-- Filters Bar -->
+                        <div class="filters-bar">
+                            <div class="search-wrapper">
+                                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                                <input type="text" id="job-search-input" class="input-field search-input"
+                                    placeholder="Search by Job Title or Location...">
+                            </div>
+
+                            <select id="filter-job-status" class="filter-select">
+                                <option value="all">All Statuses</option>
+                                <option value="Active">Active</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+
+                            <select id="filter-job-type" class="filter-select">
+                                <option value="all">All Job Types</option>
+                                <option value="Full-time">Full-time</option>
+                                <option value="Part-time">Part-time</option>
+                                <option value="Contract">Contract</option>
+                                <option value="Remote">Remote</option>
+                                <option value="Internship">Internship</option>
+                            </select>
+                        </div>
+
+                        <!-- Jobs Display Grid -->
+                        <div class="jobs-grid" id="jobs-grid-container">
+                            <!-- Dynamically populated or empty state -->
+                        </div>
+                    </section>
+
+                    <!-- 2C. APPLICANTS VIEW -->
+                    <section id="view-applicants" class="view-section">
+                        <div class="section-header-actions">
+                            <h3>Candidate Profiles</h3>
+
+                            <!-- Search & Job Filter for Applicants -->
+                            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                                <input type="text" id="applicant-search-input" class="input-field"
+                                    placeholder="Search by Name..."
+                                    style="width: 200px; padding: 0.55rem 0.85rem; font-size: 0.85rem;">
+                                <select id="filter-applicant-job" class="filter-select"
+                                    style="min-width: 200px; padding: 0.55rem 0.85rem; font-size: 0.85rem;">
+                                    <option value="all">All Positions</option>
+                                    <!-- Dynamically populated -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="data-table" id="applicants-table">
+                                <thead>
+                                    <tr>
+                                        <th>Applicant Name</th>
+                                        <th>Job Position</th>
+                                        <th>Date Applied</th>
+                                        <th>Status Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="applicants-list">
+                                    <!-- Dynamically rendered rows or empty state -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <!-- 2D. BUSINESS PROFILE VIEW -->
+                    <section id="view-profile" class="view-section">
+                        <div class="profile-card">
+                            <div class="profile-card-header">
+                                <div class="profile-card-icon">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path
+                                            d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div class="profile-card-title">
+                                    <h3>Edit Profile Information</h3>
+                                    <p>Update your company public profiles and primary point of contacts</p>
+                                </div>
+                            </div>
+
+                            <form id="profile-form" novalidate>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="profile-biz-name">Business Name</label>
+                                        <input type="text" id="profile-biz-name" class="input-field" required>
+                                        <span class="validation-msg" id="err-profile-biz-name">Business name is
+                                            required.</span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="profile-owner-name">Owner Name</label>
+                                        <input type="text" id="profile-owner-name" class="input-field" required>
+                                        <span class="validation-msg" id="err-profile-owner-name">Owner name is
+                                            required.</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="profile-email">Business Email</label>
+                                        <input type="email" id="profile-email" class="input-field" required>
+                                        <span class="validation-msg" id="err-profile-email">Please enter a valid
+                                            business email.</span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="profile-phone">Contact Number</label>
+                                        <input type="text" id="profile-phone" class="input-field" required>
+                                        <span class="validation-msg" id="err-profile-phone">Contact number is
+                                            required.</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="profile-address">Business Address</label>
+                                    <textarea id="profile-address" class="input-field" rows="3" required
+                                        style="resize: vertical; min-height: 80px;"></textarea>
+                                    <span class="validation-msg" id="err-profile-address">Address is
+                                        required.</span>
+                                </div>
+
+                                <div class="profile-footer">
+                                    <button type="submit" class="btn btn-primary" id="btn-save-profile">
+                                        Save Profile Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- A. ADD/EDIT JOB MODAL -->
+    <div class="modal-backdrop" id="modal-job-form-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="job-modal-title">Post New Job</h3>
+                <button class="modal-close-btn" id="btn-close-job-modal" aria-label="Close modal">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <form id="job-form" novalidate>
+                <input type="hidden" id="job-form-id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="job-title">Job Title</label>
+                        <input type="text" id="job-title" class="input-field"
+                            placeholder="e.g. Senior Software Architect" required>
+                        <span class="validation-msg" id="err-job-title">Job title is required.</span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="job-location">Location</label>
+                            <input type="text" id="job-location" class="input-field"
+                                placeholder="e.g. San Francisco, CA / Remote" required>
+                            <span class="validation-msg" id="err-job-location">Location is required.</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="job-salary">Salary Range</label>
+                            <input type="text" id="job-salary" class="input-field"
+                                placeholder="e.g. $120,000 - $140,000" required>
+                            <span class="validation-msg" id="err-job-salary">Salary details are required.</span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="job-type">Employment Type</label>
+                            <select id="job-type" class="input-field" style="appearance: auto; padding: 0.65rem;"
+                                required>
+                                <option value="" disabled selected>-- Select Type --</option>
+                                <option value="Full-time">Full-time</option>
+                                <option value="Part-time">Part-time</option>
+                                <option value="Contract">Contract</option>
+                                <option value="Remote">Remote</option>
+                                <option value="Internship">Internship</option>
+                            </select>
+                            <span class="validation-msg" id="err-job-type">Please select employment type.</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="job-status">Listing Status</label>
+                            <select id="job-status" class="input-field" style="appearance: auto; padding: 0.65rem;"
+                                required>
+                                <option value="Active" selected>Active</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="job-description">Job Description</label>
+                        <textarea id="job-description" class="input-field" rows="4"
+                            placeholder="Briefly describe roles, responsibilities, and team environment..." required
+                            style="resize: vertical; min-height: 100px;"></textarea>
+                        <span class="validation-msg" id="err-job-description">Job description must be at least
+                            15
+                            characters long.</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="job-requirements">Requirements</label>
+                        <textarea id="job-requirements" class="input-field" rows="4"
+                            placeholder="List key requirements (one per line)..." required
+                            style="resize: vertical; min-height: 100px;"></textarea>
+                        <span class="validation-msg" id="err-job-requirements">Job requirements list is
+                            required.</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btn-cancel-job-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-job-form">Post Job</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- B. DETAILED JOB VIEW MODAL -->
+    <div class="modal-backdrop" id="modal-job-detail-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="detail-modal-title">Job Details Overview</h3>
+                <button class="modal-close-btn" id="btn-close-detail-modal" aria-label="Close modal">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-section">
+                    <div class="detail-label">Title & Status</div>
+                    <div style="display: flex; align-items: center; gap: 0.50rem; margin-top: 0.2rem;">
+                        <h4 id="detail-job-title" style="font-size: 1.15rem; font-weight: 700;">Developer
+                            Position</h4>
+                        <span id="detail-job-status" class="badge">Active</span>
+                        <span id="detail-job-type" class="badge badge-blue">Full-time</span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="detail-section">
+                        <div class="detail-label">Location</div>
+                        <div id="detail-job-location" class="detail-value">City, State / Remote</div>
+                    </div>
+                    <div class="detail-section">
+                        <div class="detail-label">Salary Details</div>
+                        <div id="detail-job-salary" class="detail-value">$100,000 / year</div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-label">Posted Date</div>
+                    <div id="detail-job-date" class="detail-value">August 11, 2026</div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-label">Role Description</div>
+                    <div id="detail-job-description" class="detail-value">Description text.</div>
+                </div>
+
+                <div class="detail-section" style="margin-bottom: 0;">
+                    <div class="detail-label">Job Requirements</div>
+                    <div id="detail-job-requirements" class="detail-value detail-value-pre">Requirements text.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btn-close-detail-modal-footer" style="width: 100%;">Close
+                    Details</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- C. CUSTOM DELETE CONFIRMATION MODAL -->
+    <div class="modal-backdrop" id="modal-delete-confirm-backdrop">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-confirm-body">
+                <div class="confirm-icon-danger">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                        </path>
+                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                    </svg>
+                </div>
+                <h4>Delete Job Listing?</h4>
+                <p>Are you sure you want to delete "<strong id="delete-confirm-job-title">Job Title</strong>"?
+                    This
+                    action is permanent and cannot be undone.</p>
+            </div>
+            <div class="modal-footer" style="justify-content: stretch; gap: 0.5rem;">
+                <button class="btn btn-secondary" id="btn-delete-cancel" style="flex: 1;">Cancel</button>
+                <button class="btn btn-danger" id="btn-delete-confirm" style="flex: 1;">Confirm Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- D. TOAST NOTIFICATION CONTAINER -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Load JavaScript Logic -->
+    <script>
+        // Applicant login form: hidden until "Create Applicant Account" is clicked.
+        function showApplicantLogin() {
+            const box = document.getElementById("applicantLoginBox");
+            if (box) box.style.display = "block";
+        }
+
+        function hideApplicantLogin() {
+            const box = document.getElementById("applicantLoginBox");
+            if (box) box.style.display = "none";
+        }
+    </script>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
